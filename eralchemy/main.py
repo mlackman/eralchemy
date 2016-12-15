@@ -6,7 +6,7 @@ from pygraphviz.agraph import AGraph
 from sqlalchemy.engine.url import make_url
 from sqlalchemy.exc import ArgumentError
 from eralchemy.helpers import check_args
-from eralchemy.parser import markdown_file_to_intermediary, line_iterator_to_intermediary, ParsingException
+from eralchemy.parser import markdown_file_to_intermediary, line_iterator_to_intermediary, ParsingException, ddl_to_intermediary
 import argparse
 import sys
 
@@ -108,6 +108,9 @@ def all_to_intermediary(filename_or_input, schema=None):
         return tables, relationships
     except KeyError:
         pass
+
+    return ddl_to_intermediary(filename_or_input)
+
 
     # try to read markdown file.
     if isinstance(filename_or_input, basestring):

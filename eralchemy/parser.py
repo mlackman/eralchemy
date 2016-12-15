@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from eralchemy.models import Table, Relation, Column
+from pysqlparser import ddlparser
 
 
 class ParsingException(Exception):
@@ -121,6 +122,34 @@ def markdown_file_to_intermediary(filename):
     with open(filename) as f:
         lines = f.readlines()
     return line_iterator_to_intermediary(lines)
+
+def ddl_to_intermediary(filename):
+  """ Parse a ddl file and return intermediary. """
+  with open(filename) as f:
+    data = f.read()
+
+  tables = ddlparser.parse(data)
+  int_tables = []
+  all_relations = []
+  for table in tables:
+    columns = []
+    for column in table.columns:
+      intermediary_column = Column(column.name, type=str(column.data_type), is_key=column.is_primary_key)
+      columns.append(intermediary_column)
+
+      uniq_references_to_tables = set()
+      for reference in column.references:
+        uniq_references_to_tables.add(reference.table_name)
+
+      relations = [Relation(table_name, table.fullname, '+', '1') for table_name in uniq_references_to_tables]
+      all_relations.extend(relations)
+
+
+    int_tables.append(Table(name=table.fullname, columns=columns))
+
+
+  return int_tables, all_relations
+
 
 
 def line_iterator_to_intermediary(line_iterator):
