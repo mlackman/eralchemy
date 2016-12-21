@@ -108,7 +108,6 @@ def all_to_intermediary(filename_or_input, schema=None):
         return tables, relationships
     except KeyError:
         pass
-
     return ddl_to_intermediary(filename_or_input)
 
 

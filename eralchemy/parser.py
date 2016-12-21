@@ -3,6 +3,7 @@ from eralchemy.models import Table, Relation, Column
 from pysqlparser import ddlparser
 
 
+
 class ParsingException(Exception):
     base_traceback = 'Error on line {line_nb}: {line}\n{error}'
     hint = None
@@ -125,9 +126,16 @@ def markdown_file_to_intermediary(filename):
 
 def ddl_to_intermediary(filename):
   """ Parse a ddl file and return intermediary. """
-  with open(filename) as f:
-    data = f.read()
+  if isinstance(filename, str):
+    with open(filename):
+      data = f.read()
+  else:
+    data = filename.read()
 
+  return ddl_content_to_intermediary(data)
+
+
+def ddl_content_to_intermediary(data):
   tables = ddlparser.parse(data)
   int_tables = []
   all_relations = []
